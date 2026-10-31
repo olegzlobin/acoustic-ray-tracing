@@ -1,0 +1,53 @@
+/* App-level styles on top of the brand tokens (src/styles/brand-theme.css). */
+* { box-sizing: border-box; }
+html, body, #app { margin: 0; height: 100%; }
+body { overflow-x: hidden; }
+
+button, select, input[type='text'], input[type='number'], input:not([type]) {
+  color: var(--fg);
+  background: var(--raise);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 4px 12px;
+  min-height: 32px;
+}
+select, input[type='text'], input[type='number'], input:not([type]) { padding: 4px 8px; }
+button:hover:not(:disabled), select:hover:not(:disabled), input[type='text']:hover, input[type='number']:hover, input:not([type]):hover { border-color: var(--muted); }
+button:disabled { opacity: .4; cursor: default; }
+button.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+button.primary:hover:not(:disabled) { border-color: var(--fg); }
+/* pressed / toggled-on buttons */
+button.on, button[aria-pressed='true'] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+input[type='range'] { width: 100%; }
+label { color: var(--muted); font-size: 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+/* Side-panel kit shared by the panel components */
+.group { display: flex; flex-direction: column; gap: 8px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.group:last-of-type { border-bottom: 0; padding-bottom: 0; }
+.group > summary { cursor: pointer; font: 600 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 4px 0; }
+.group > summary:hover { color: var(--fg); }
+.group[open] > summary { margin-bottom: 4px; }
+.sub { display: flex; flex-direction: column; gap: 8px; }
+/* flex children may shrink below their content (wide tables scroll inside instead of widening the panel) */
+.group > *, .sub > * { min-width: 0; }
+/* panel actions span the panel: no ragged, text-wide buttons in a column of full-width fields */
+.group > button, .sub > button { width: 100%; }
+.sub > summary { cursor: pointer; font-size: 13px; color: var(--muted); padding: 4px 0; }
+.sub > summary:hover, .sub[open] > summary { color: var(--fg); }
+.warn { background: var(--raise); border: 1px solid var(--warn); color: var(--warn); border-radius: var(--radius); padding: 8px; font-size: 12px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: end; }
+/* only the panels' own selects (not those of the embedded export/material editors) */
+.group > select, .group > label > select, .group > .row2 > label > select,
+.sub > label > select, .sub > .row2 > label > select { width: 100%; min-width: 0; }
+.dim { color: var(--muted); font-size: 12px; }
+.hint { margin: 0; }
+.err { color: var(--err); margin: 0; font-size: 13px; }
+.chk { flex-direction: row; align-items: center; gap: 4px; font-size: 14px; }
+.bands { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.nameinput { width: 100%; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* Slider parameter: "name ... value" row with the full-width range below (modeled on .sim-param) */
+.param { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; align-items: center; font-size: 13px; }
+.param .val { font: 600 12px var(--font-mono); font-variant-numeric: tabular-nums; color: var(--fg); }
+.param input[type='range'] { grid-column: 1 / -1; width: 100%; margin: 0; }

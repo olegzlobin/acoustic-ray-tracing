@@ -1,0 +1,51 @@
+/* Фирменная тема интерфейса «Лаборатория» для браузерных симуляций.
+   Шрифты: Commissioner (заголовки), Onest (текст), IBM Plex Mono (код, цифры, метки). */
+/* Шрифты раздаются локально (@fontsource, импорт в src/main.ts), а не @import с Google Fonts:
+   внешний @import блокирует отрисовку страницы, пока не ответит fonts.googleapis.com. */
+
+:root {
+  /* поверхности */
+  --bg: #101624;        /* navy-950 */
+  --panel: #161D2E;
+  --raise: #1F2635;     /* navy-900: поля ввода, кнопки */
+  --line: #2A3242;
+  /* текст */
+  --fg: #F0E8CF;        /* cream-100 */
+  --muted: #969EB2;     /* navy-400 */
+  /* акцент и состояния */
+  --accent: #E15151;    /* red-500: главное действие, активное */
+  --accent-fg: #101624;
+  --accent-text: #F56D69; /* red-400: красный текст на тёмном */
+  --ok: #51B954;
+  --warn: #E8BF3A;
+  --err: #F56D69;
+  /* серии на графиках */
+  --series-1: #E15151; --series-2: #E8BF3A; --series-3: #0A9BA6;
+  --series-4: #5882EF; --series-5: #BC5CC5;
+  /* форма */
+  --radius: 4px;
+  --font-display: "Commissioner Variable", "Commissioner", system-ui, sans-serif;
+  --font-body: "Onest", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  color-scheme: dark;
+}
+
+body { background: var(--bg); color: var(--fg); font: 14px/1.4 var(--font-body); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 800; }
+
+.panel { background: var(--panel); border: 1px solid var(--line); }
+.label { font: 600 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.value { font: 600 12px var(--font-mono); color: var(--fg); font-variant-numeric: tabular-nums; }
+
+button, select, input:not([type]), input[type="text"], input[type="number"] {
+  font: inherit; color: var(--fg); background: var(--raise);
+  border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 10px;
+}
+button { cursor: pointer; font-weight: 600; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+button[aria-pressed="true"] { background: var(--fg); color: var(--bg); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+input[type="range"], input[type="checkbox"] { accent-color: var(--accent); }
+
+/* Шкалы для данных (11 опорных точек, интерполировать в OKLCH или линейно в RGB):
+   Ember — последовательная, Tide/Abyss — расходящиеся. Точные значения: brand-palette.html, раздел «Шкалы для данных». */

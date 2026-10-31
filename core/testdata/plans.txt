@@ -1,0 +1,258 @@
+# Plan-analysis cases shared by core/src/plan.rs and src/editor/plan.test.ts.
+# case <name> / wall x1 y1 x2 y2 ... / rooms <room faces> <obstacle faces> / area <floor area>
+# [sides <sum of length x room sides over all walls>] / probe x y room|obstacle|outside ... / end
+
+case shoebox
+wall 0 0 10 0
+wall 10 0 10 7
+wall 10 7 0 7
+wall 0 7 0 0
+rooms 1 0
+area 70
+sides 34
+probe 5 3.5 room
+probe -1 3 outside
+probe 11 3 outside
+end
+
+case l_room
+wall 0 0 12 0
+wall 12 0 12 5
+wall 12 5 5 5
+wall 5 5 5 12
+wall 5 12 0 12
+wall 0 12 0 0
+rooms 1 0
+area 95
+sides 48
+probe 2 10 room
+probe 9 2 room
+probe 9 9 outside
+end
+
+case open_shell
+wall 0 0 10 0
+wall 10 0 10 7
+wall 10 7 0 7
+rooms 0 0
+area 0
+probe 5 3 outside
+end
+
+case partition_joined_at_vertices
+# shell with extra vertices at (4,0) and (4,4); the partition joins them exactly (degree-3 vertices)
+wall 0 0 4 0
+wall 4 0 8 0
+wall 8 0 8 4
+wall 8 4 4 4
+wall 4 4 0 4
+wall 0 4 0 0
+wall 4 0 4 4
+rooms 2 0
+area 32
+sides 32
+probe 2 2 room
+probe 6 2 room
+end
+
+case partition_t_junction_mid_segment
+wall 0 0 10 0
+wall 10 0 10 5
+wall 10 5 0 5
+wall 0 5 0 0
+wall 5 0 5 5
+rooms 2 0
+area 50
+sides 40
+probe 2 2 room
+probe 8 3 room
+end
+
+case two_rooms_one_shared_wall
+wall 0 0 4 0
+wall 4 0 8 0
+wall 8 0 8 4
+wall 8 4 4 4
+wall 4 4 0 4
+wall 0 4 0 0
+wall 4 0 4 4
+rooms 2 0
+area 32
+sides 32
+end
+
+case two_rooms_shared_wall_drawn_twice
+wall 0 0 4 0
+wall 4 0 4 4
+wall 4 4 0 4
+wall 0 4 0 0
+wall 4 0 8 0
+wall 8 0 8 4
+wall 8 4 4 4
+wall 4 4 4 0
+rooms 2 0
+area 32
+sides 40
+probe 2 2 room
+probe 6 2 room
+end
+
+case pillar
+wall 0 0 10 0
+wall 10 0 10 7
+wall 10 7 0 7
+wall 0 7 0 0
+wall 4 3 6 3
+wall 6 3 6 5
+wall 6 5 4 5
+wall 4 5 4 3
+rooms 1 1
+area 66
+sides 42
+probe 5 4 obstacle
+probe 1 1 room
+end
+
+case pillar_in_pillar
+wall 0 0 10 0
+wall 10 0 10 10
+wall 10 10 0 10
+wall 0 10 0 0
+wall 2 2 8 2
+wall 8 2 8 8
+wall 8 8 2 8
+wall 2 8 2 2
+wall 4 4 6 4
+wall 6 4 6 6
+wall 6 6 4 6
+wall 4 6 4 4
+rooms 2 1
+area 68
+sides 72
+probe 5 5 room
+probe 3 3 obstacle
+probe 1 1 room
+end
+
+case open_baffle_in_room
+wall 0 0 10 0
+wall 10 0 10 7
+wall 10 7 0 7
+wall 0 7 0 0
+wall 2 1 2 3
+wall 2 3 3 4
+rooms 1 0
+area 70
+sides 40.82842712474619
+probe 5 5 room
+end
+
+case spur_outside_the_room
+wall 0 0 10 0
+wall 10 0 10 7
+wall 10 7 0 7
+wall 0 7 0 0
+wall 10 3.5 12 3.5
+rooms 1 0
+area 70
+sides 34
+probe 11 3.6 outside
+end
+
+case crossing_partitions
+# full-height partition and full-width partition cross in the middle (X crossing), ends mid-wall
+wall 0 0 10 0
+wall 10 0 10 6
+wall 10 6 0 6
+wall 0 6 0 0
+wall 5 0 5 6
+wall 0 3 10 3
+rooms 4 0
+area 60
+sides 64
+probe 2 1 room
+probe 8 5 room
+end
+
+case apartment_preset
+wall 0 0 10 0
+wall 10 0 10 7
+wall 10 7 0 7
+wall 0 7 0 0
+wall 6 0 6 1.2
+wall 6 1.2 6 2.1
+wall 6 2.1 6 7
+wall 6 4.5 7.3 4.5
+wall 7.3 4.5 8.2 4.5
+wall 8.2 4.5 10 4.5
+rooms 3 0
+area 70
+sides 56
+probe 2 3 room
+probe 8 2 room
+probe 8 6 room
+end
+
+case two_rooms_doorway_preset
+wall 0 0 10 0
+wall 10 0 10 5
+wall 10 5 0 5
+wall 0 5 0 0
+wall 5 0 5 1
+wall 5 2 5 5
+rooms 1 0
+area 50
+sides 38
+probe 2 2 room
+probe 8 2 room
+end
+
+case closet_attached_to_a_wall
+wall 0 0 10 0
+wall 10 0 10 7
+wall 10 7 0 7
+wall 0 7 0 0
+wall 2 0 2 2
+wall 2 2 4 2
+wall 4 2 4 0
+rooms 2 0
+area 70
+probe 3 1 room
+probe 6 3 room
+end
+
+case two_separate_rooms
+wall 0 0 5 0
+wall 5 0 5 5
+wall 5 5 0 5
+wall 0 5 0 0
+wall 10 0 15 0
+wall 15 0 15 5
+wall 15 5 10 5
+wall 10 5 10 0
+rooms 2 0
+area 50
+sides 40
+probe 7 2 outside
+end
+
+case endpoint_half_a_millimetre_off_the_wall
+wall 0 0 10 0
+wall 10 0 10 5
+wall 10 5 0 5
+wall 0 5 0 0
+wall 5 0.0005 5 5
+rooms 2 0
+# the shared vertex sits on the partition's end, 0.5 mm above the wall: the shell bends by that much
+area 49.9975
+end
+
+case five_millimetre_gap_stays_open
+wall 0 0 10 0
+wall 10 0 10 5
+wall 10 5 0 5
+wall 0 5 0 0
+wall 5 0.005 5 5
+rooms 1 0
+area 50
+end

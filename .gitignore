@@ -1,0 +1,6 @@
+node_modules
+dist
+core/target
+src/wasm/core.wasm
+.claude/
+__pycache__/
