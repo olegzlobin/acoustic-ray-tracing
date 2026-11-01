@@ -104,8 +104,9 @@ export async function renderBinaural(o: RenderOptions): Promise<Float32Array[]> 
     src.start(0);
   }
 
-  // Progress: suspend at a few points (must be scheduled before rendering starts).
-  const steps = 8;
+  // Progress: suspend at a few points (must be scheduled before rendering starts). Firefox has no
+  // OfflineAudioContext.suspend: there the export just runs without intermediate progress.
+  const steps = typeof ctx.suspend === 'function' ? 8 : 0;
   for (let i = 1; i <= steps; i++) {
     const t = (length * i) / (steps + 1) / o.sampleRate;
     ctx.suspend(t).then(() => {

@@ -54,6 +54,7 @@ export const ru: Dict = {
   'preset.tworooms': 'Две комнаты с проёмом',
   'preset.apartment': 'Квартира (3 комнаты, двери)',
   'preset.curtain': 'Комната, разделённая шторой',
+  'preset.apartment2k': '2к квартира',
 
   // ---- звук
   'snd.title': 'Звук',
@@ -109,7 +110,7 @@ export const ru: Dict = {
   'sig.guitar': 'Гитарное арпеджио',
   'sig.marimba': 'Мелодия маримбы',
   'sig.drums': 'Барабанный ритм',
-  'sig.clap': 'Хлопок (раз в 1.5 с)',
+  'sig.clap': 'Clap (раз в 1.5 с)',
   'sig.noise': 'Всплески розового шума',
   'sig.fileChoose': 'Свой аудиофайл…',
   'sig.fileNamed': 'Свой файл: {name}',

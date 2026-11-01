@@ -21,7 +21,7 @@ export function pairPositions(src: Pick<Source, 'pos' | 'width' | 'angle'>): { l
   return { l: [src.pos[0] + lx, src.pos[1] + ly, src.pos[2]], r: [src.pos[0] - lx, src.pos[1] - ly, src.pos[2]] };
 }
 
-/** Angle that turns a pair at `pos` to face the listener (used once, when a stereo file is loaded). */
+/** Angle that turns a source at `pos` to face the listener (presets and newly added sources). */
 export const facing = (pos: readonly number[], listener: readonly number[]): number =>
   Math.atan2(listener[1] - pos[1], listener[0] - pos[0]);
 

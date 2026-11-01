@@ -8,7 +8,7 @@ import { expose } from '../debug';
 import { t } from '../i18n.svelte';
 import type { Eq } from '../audio/eq';
 import type { Scene, SignalKind, Source } from '../scene';
-import { facing, isPairActive, wrapAngle } from '../stereo';
+import { isPairActive } from '../stereo';
 import type { SceneStore } from './scene-store.svelte';
 import { rKey, type SlotMap } from './slots.svelte';
 
@@ -147,9 +147,7 @@ export class AudioController {
       this.fileNames.set(slot, f.name);
       this.fileChans.set(slot, buf.numberOfChannels);
       this.fileNamesVer++;
-      // A stereo file becomes a pair facing the listener; afterwards it keeps that placement.
-      const s = this.deps.scene.sources[store.selSrc];
-      store.updateSource(store.selSrc, buf.numberOfChannels >= 2 && s ? { signal: 'file', angle: wrapAngle(facing(s.pos, this.deps.scene.listener)) } : { signal: 'file' });
+      store.updateSource(store.selSrc, { signal: 'file' });
       if (this.playing) eng.setSignal(slot, 'file');
     } catch (err) {
       setError(message(err));

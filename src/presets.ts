@@ -1,6 +1,7 @@
 import { BUILTIN_MATERIALS, cloneMaterial } from './materials';
 import { facing, wrapAngle } from './stereo';
-import { DEFAULT_DETAIL, makeSource, normalizeWallZ, type Pt, type Scene, type Source, type Wall } from './scene';
+import { DEFAULT_DETAIL, makeSource, normalizeWallZ, parseScene, type Pt, type Scene, type Source, type Wall } from './scene';
+import apartment2k from './apartment-2k.json';
 
 interface RoomSpec {
   name: string;
@@ -370,6 +371,15 @@ export const PRESETS: Preset[] = [
           slab(5.2, 2.9, 1.2, 0.8),
         ],
       ),
+  },
+  {
+    id: 'apartment2k',
+    name: 'Two-room apartment',
+    make: () => {
+      const r = parseScene(apartment2k);
+      if (!r.scene) throw new Error(r.errors.join('; '));
+      return r.scene;
+    },
   },
 ];
 

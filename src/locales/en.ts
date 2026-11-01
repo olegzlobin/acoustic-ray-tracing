@@ -54,6 +54,7 @@ export const en = {
   'preset.tworooms': 'Two rooms + doorway',
   'preset.apartment': 'Apartment (3 rooms, doors)',
   'preset.curtain': 'Curtain-divided room',
+  'preset.apartment2k': 'Two-room apartment',
 
   // ---- sound
   'snd.title': 'Sound',
