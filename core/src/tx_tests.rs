@@ -25,6 +25,23 @@ pub(crate) fn hist_digest(h: &rays::Hist) -> u64 {
     x
 }
 
+/// Size and shape of a series: sum of magnitudes and magnitude-weighted centre. Unlike a bit digest it survives
+/// the last-bit differences between libm versions, and any real change (a different RNG stream) still moves it.
+fn profile(v: impl Iterator<Item = f64>) -> [f64; 2] {
+    let (mut sum, mut moment) = (0.0, 0.0);
+    for (i, a) in v.enumerate() {
+        sum += a.abs();
+        moment += a.abs() * i as f64;
+    }
+    [sum, moment / sum]
+}
+
+fn assert_profile(name: &str, what: &str, got: [f64; 2], want: [f64; 2]) {
+    for (g, w) in got.iter().zip(want) {
+        assert!((g - w).abs() <= 1e-9 * w.abs(), "{name}: {what} differs: {got:?} vs {want:?}");
+    }
+}
+
 pub(crate) fn paths_digest(paths: &[ism::Path]) -> u64 {
     let mut x = FNV0;
     for p in paths {
@@ -119,36 +136,39 @@ fn two_rooms(wa: f64, wb: f64, d: f64, h: f64, wall: Material, part: Material, g
 
 // ---------------------------------------------------------------- 1. tau = 0 regression
 
-// Digests recorded from the implementation BEFORE transmission existed (opaque walls). The new code
-// must reproduce them exactly when every tau is 0: same ISM paths and IR, same ray histogram
-// (including the RNG stream), same heat map.
-const GOLDEN: [(&str, u64, u64, u64, u64, u64, u64); 4] = [
-    // name, paths(order 3), IR(24000), hist digest, steps, heat digest
-    ("shoebox", 0x1fff0f1d5acb2886, 0x71b1cc0921a95443, 0x5c8ba4cd5e0a556e, 140375, 0x3c8909ac6d7288b7, 63),
-    ("L-room", 0x8fa7092d744939bc, 0x4619437cdd2e9c10, 0x6a6ec7608bd4ee18, 163442, 0x1e13a34101773a0e, 15),
-    ("cathedral", 0xfd955bd2e901d12f, 0xdcfe970c5118588f, 0x3808c657b1518ef1, 116438, 0xfb9bd6ec307073f7, 59),
-    ("pillar+baffle", 0xa52f18346efd586b, 0x58d6c6f28ef7f2e3, 0xa9b0332eafd26658, 154689, 0xfa5fb39c2fbb9583, 27),
+// Recorded from the implementation BEFORE transmission existed (opaque walls). The new code must reproduce
+// them when every tau is 0: same ISM paths and IR, same ray histogram (including the RNG stream), same heat
+// map. Ray and heat results go through sin/cos/ln of the system libm, whose last bits change between glibc
+// versions, so they are compared as profiles, not bit digests.
+type Golden = (&'static str, u64, u64, [f64; 2], [f64; 2], u64, [f64; 2], u64);
+const GOLDEN: [Golden; 4] = [
+    // name, paths(order 3), IR(24000), hist energy, hist direction, steps, heat map, path count
+    ("shoebox", 0x1fff0f1d5acb2886, 0x71b1cc0921a95443, [3.349424456289982, 425.2685207916637], [1.953490558293059, 210.14695253881888], 140375, [299.09355702996254, 414.8072952268352], 63),
+    ("L-room", 0x8fa7092d744939bc, 0x4619437cdd2e9c10, [10.506413214101624, 1427.8120050543573], [12.4362061239833, 857.2751372596714], 163442, [1075.0362712815404, 584.7319302980918], 15),
+    ("cathedral", 0xfd955bd2e901d12f, 0xdcfe970c5118588f, [1.3980407797140317, 7596.694427126674], [2.8014533637669103, 4064.490580185006], 116438, [241.96084609327, 5861.684875264076], 59),
+    ("pillar+baffle", 0xa52f18346efd586b, 0x58d6c6f28ef7f2e3, [1.8020848004206358, 450.1122391261562], [1.097372581441736, 210.30645374451916], 154689, [261.93166783824563, 426.0234460201096], 27),
 ];
 
 fn check_regression(cases: &[Case]) {
     for ((name, sc, src, lis, n, tmax), g) in cases.iter().zip(GOLDEN.iter()) {
         assert_eq!(name, &g.0);
         let paths = ism::compute_paths(sc, *src, *lis, 3);
-        assert_eq!(paths.len(), g.6 as usize, "{name}: path count");
+        assert_eq!(paths.len(), g.7 as usize, "{name}: path count");
         assert!(paths.iter().all(|p| p.crossed == 0));
         assert_eq!(paths_digest(&paths), g.1, "{name}: ISM paths differ from the opaque-wall implementation");
         let ir = dsp::synth_ir(&paths, 48000.0, 24000);
         assert_eq!(f32_digest(&ir), g.2, "{name}: IR differs");
         let p = rays::RayParams { n_rays: *n, t_max: *tmax, ..Default::default() };
         let (h, _) = rays::trace(sc, *src, *lis, &p);
-        assert_eq!(hist_digest(&h), g.3, "{name}: ray histogram differs");
-        assert_eq!(h.steps, g.4, "{name}: ray step count differs");
+        assert_profile(name, "ray histogram", profile(h.e.iter().copied()), g.3);
+        assert_profile(name, "ray directions", profile(h.dir.iter().flatten().copied()), g.4);
+        assert_eq!(h.steps, g.5, "{name}: ray step count differs");
         let bb = rays::Geo::new(sc, 12).bbox;
         let (x0, y0, cell, nx, ny) = heat::grid_for(bb, 0.5, 4000);
         let hp = heat::HeatParams { x0, y0, cell, nx, ny, ear_z: 1.2, n_rays: 6000, t_max: 1.0, seed: 5, dir: Default::default() };
         let mut ht = heat::HeatTracer::new(sc, *src, &hp);
         ht.step(6000);
-        assert_eq!(f32_digest(&ht.snapshot()), g.5, "{name}: heat map differs");
+        assert_profile(name, "heat map", profile(ht.snapshot().iter().map(|&v| v as f64)), g.6);
     }
 }
 
