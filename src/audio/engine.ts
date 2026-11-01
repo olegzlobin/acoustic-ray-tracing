@@ -194,7 +194,7 @@ class SourceChannel {
   /** Splits the stereo player of a pair. */
   splitter: ChannelSplitterNode | null = null;
 
-  constructor(readonly ctx: AudioContext, private dry: AudioNode, renderIn: AudioNode, wetIn: AudioNode) {
+  constructor(readonly ctx: AudioContext, private dry: AudioNode, renderIn: AudioNode, wetIn: AudioNode, swapGap: number) {
     this.input = ctx.createGain();
     // Mono in: a stereo source is summed (0.5 (L + R)) here, a pair is split by the engine.
     this.input.channelCount = 1;
@@ -206,9 +206,9 @@ class SourceChannel {
     eq.output.connect(this.bus);
     this.bus.connect(dry);
     // Early: 30 ms crossfade, swaps >= 45 ms apart. Late: 200 ms crossfade, swaps >= 260 ms apart.
-    this.early = new Chain(ctx, this.bus, 'early', 0.03, 45);
-    this.late = new Chain(ctx, this.bus, 'late', 0.2, 260);
-    this.bin = new Chain(ctx, this.bus, 'bin', 0.03, 45);
+    this.early = new Chain(ctx, this.bus, 'early', 0.03, 45 * swapGap);
+    this.late = new Chain(ctx, this.bus, 'late', 0.2, 260 * swapGap);
+    this.bin = new Chain(ctx, this.bus, 'bin', 0.03, 45 * swapGap);
     this.early.connect(renderIn);
     this.late.connect(renderIn);
     this.bin.connect(wetIn);
@@ -266,6 +266,7 @@ export class AudioEngine {
   private channels = new Map<number, SourceChannel>();
   private yaw = 0;
   private mic: MediaStream | null = null;
+  private swapGap = 1;
   playing = false;
 
   private constructor(ctx: AudioContext) {
@@ -274,10 +275,12 @@ export class AudioEngine {
   }
 
   /** Must be called from a user gesture (creates/resumes the AudioContext). */
-  static async create(): Promise<AudioEngine> {
-    const ctx = new AudioContext({ latencyHint: 'interactive' });
+  static async create(lite = false): Promise<AudioEngine> {
+    // Light mode: a larger output buffer (fewer dropouts) and rarer IR swaps (less work on the main thread).
+    const ctx = new AudioContext({ latencyHint: lite ? 'playback' : 'interactive' });
     await ctx.resume();
     const e = new AudioEngine(ctx);
+    e.swapGap = lite ? 3 : 1;
     // Omnitone 2.x: createFOARenderer(ctx) + initialize(); default channel map is ACN (AmbiX).
     e.renderer = Omnitone.createFOARenderer(ctx);
     await e.renderer.initialize();
@@ -304,7 +307,7 @@ export class AudioEngine {
   private ch(slot: number, follower = false): SourceChannel {
     let c = this.channels.get(slot);
     if (!c) {
-      c = new SourceChannel(this.ctx, this.dry, this.renderer.input, this.wet);
+      c = new SourceChannel(this.ctx, this.dry, this.renderer.input, this.wet, this.swapGap);
       c.follower = follower;
       this.channels.set(slot, c);
       if (this.playing && !follower) this.startChannel(c);

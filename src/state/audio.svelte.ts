@@ -6,6 +6,7 @@ import { AudioEngine } from '../audio/engine';
 import { audioOk } from '../capabilities';
 import { expose } from '../debug';
 import { t } from '../i18n.svelte';
+import { perf } from '../perf-mode.svelte';
 import type { Eq } from '../audio/eq';
 import type { Scene, SignalKind, Source } from '../scene';
 import { isPairActive } from '../stereo';
@@ -96,7 +97,7 @@ export class AudioController {
   async ensureEngine() {
     if (!this.engine) {
       if (!audioOk) throw new Error(t('err.noWebAudio'));
-      this.engine = await AudioEngine.create(); // needs a user gesture
+      this.engine = await AudioEngine.create(perf.lite); // needs a user gesture
       this.engine.watchLoad((avg, peak) => (this.loadInfo = { avg, peak }));
     }
     return this.engine;

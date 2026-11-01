@@ -206,6 +206,8 @@ export const en = {
   'calc.transmission': 'Transmission through walls',
   'calc.diffraction': 'Edge diffraction',
   'calc.diffractionTip': 'Sound bends around the edges of walls, doorways and objects: low frequencies get around a corner almost unattenuated, high ones fade out. Direct sound only; the reverberation tail is unchanged.',
+  'calc.lite': 'Light mode',
+  'calc.liteTip': 'For phones: fewer reflections and rays, lower graphics resolution. Audio settings (output buffer and IR update rate) apply after the page is reloaded',
   'calc.accurateHrtf': 'Accurate HRTF for early reflections',
   'calc.accurateHrtfTip': 'The direct sound and early reflections are convolved with the HRTF of each path\'s direction (third-order Ambisonics, SADIE filters). Off: everything goes through first-order Ambisonics, as before.',
   'calc.modes': 'Room modes (low frequencies)',

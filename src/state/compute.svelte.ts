@@ -11,6 +11,7 @@ import { directivityArgs } from '../directivity';
 import { expose } from '../debug';
 import { kfmt } from '../format';
 import { t } from '../i18n.svelte';
+import { analysisFor, perf } from '../perf-mode.svelte';
 import type { BinIr, ComputeResult, Phase } from '../protocol';
 import type { FullIr } from '../io/run-export';
 import { toWorkerScene, type P3, type Scene } from '../scene';
@@ -76,7 +77,7 @@ function add(a: Float32Array[], b: Float32Array[] | null): Float32Array[] {
 
 export class ComputeController {
   // Analysis settings and display flags (bound by the analysis panel)
-  maxOrder = $state(3);
+  maxOrder = $state(analysisFor(perf.lite).maxOrder);
   /** Sound transmission through walls (off: every wall is opaque, for A/B comparison). */
   transmission = $state(true);
   /** Edge diffraction of the direct sound (off: walls cast a sharp shadow, as before). */
@@ -86,7 +87,7 @@ export class ComputeController {
   /** Low-frequency room modes of an equivalent rectangular room below the Schroeder frequency (off: purely geometric IR, as before). */
   modes = $state(true);
   showOrders = $state([true, true, true, true]);
-  rays = $state(20000);
+  rays = $state(analysisFor(perf.lite).rays);
   showRays = $state(false);
   showBands = $state([false, false, false, false, false, false, true]);
   showEtc = $state(true);
@@ -118,6 +119,7 @@ export class ComputeController {
   constructor(private deps: ComputeDeps) {
     const { scene } = deps;
     expose('__arPerf', this.perfLog);
+    expose('__arCompute', this);
     onDestroy(() => this.worker.terminate());
     this.worker.onresult = (r) => this.onResult(r);
     this.worker.onbin = (b) => {
@@ -199,6 +201,12 @@ export class ComputeController {
     return { ...full, accurate: { foa: subtractEarlyIsm(full.ir, a.lastIsm, full.sampleRate, a.splitSec), bin: a.bin } };
   };
   isFinal = (slot: number) => this.analysis[slot]?.refine.stage === 'final' && !!this.auxOf(slot).lastFull;
+
+  /** Light mode on or off: applies its analysis settings (they stay adjustable by hand afterwards). */
+  setLite(on: boolean) {
+    perf.set(on);
+    Object.assign(this, analysisFor(on));
+  }
 
   /** A source was removed (or its right speaker): forget the slot, so a later owner starts clean. */
   removeSlot(slot: number) {

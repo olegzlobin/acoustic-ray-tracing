@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { perf } from './perf-mode.svelte';
   import { onMount, untrack } from 'svelte';
   import PlanCanvas from './components/PlanCanvas.svelte';
   import type { ToolId } from './editor/plan/types';
@@ -324,7 +325,7 @@ import { pairPositions, wrapAngle } from './stereo';
         <p class="dim">{t('mat.assignNote')}</p>
       </details>
 
-      <AnalysisPanel
+      <AnalysisPanel lite={perf.lite} onlite={(on) => compute.setLite(on)}
         bind:maxOrder={compute.maxOrder} bind:showOrders={compute.showOrders} bind:rays={compute.rays} bind:showRays={compute.showRays} bind:transmission={compute.transmission} bind:diffraction={compute.diffraction} bind:accurateHrtf={compute.accurateHrtf} bind:modes={compute.modes} bind:showBands={compute.showBands} bind:showEtc={compute.showEtc} bind:showSchroeder={compute.showSchroeder} />
 
       <details class="group" use:persistOpen={'file'} bind:this={fileGroup}>

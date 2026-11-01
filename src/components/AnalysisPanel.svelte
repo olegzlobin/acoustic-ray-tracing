@@ -15,15 +15,18 @@
     showBands: boolean[];
     showEtc: boolean;
     showSchroeder: boolean;
+    lite: boolean;
+    onlite: (on: boolean) => void;
   }
   let {
     maxOrder = $bindable(), showOrders = $bindable(), rays = $bindable(), showRays = $bindable(), transmission = $bindable(), diffraction = $bindable(), accurateHrtf = $bindable(), modes = $bindable(),
-    showBands = $bindable(), showEtc = $bindable(), showSchroeder = $bindable(),
+    showBands = $bindable(), showEtc = $bindable(), showSchroeder = $bindable(), lite, onlite,
   }: Props = $props();
 </script>
 
 <details class="group" use:persistOpen={'calc'}>
   <summary>{t('calc.title')}</summary>
+  <label class="chk" title={t('calc.liteTip')}><input type="checkbox" checked={lite} onchange={(e) => onlite(e.currentTarget.checked)} />{t('calc.lite')}</label>
   <label>{t('calc.maxOrder')}
     <select bind:value={maxOrder}>{#each [0, 1, 2, 3] as o}<option value={o}>{o}</option>{/each}</select>
   </label>

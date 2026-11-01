@@ -1,9 +1,9 @@
+import { canvasDpr } from '../../perf-mode.svelte';
 import { forEachPath, forEachRay, PATH_HEADER } from '../../layout';
 import { BG, BLUE, FG, GOLD, MUTED, TEAL, VIOLET } from '../../theme';
 import { isDirectional } from '../../directivity';
 import { heatPixels, type HeatLayer } from '../../heatmap';
 import type { Pt, Scene } from '../../scene';
-import { allVertices } from '../geometry';
 import { drawGrid, drawListener, drawObstacleFills, drawObstacleLabels, drawRulers, drawScaleBar, drawSource, drawSourceDirectional, drawSourcePair, drawWalls } from '../render';
 import type { Tool, ToolHost } from '../tools/types';
 import { toPx, type View } from '../view';
@@ -34,6 +34,8 @@ export interface PlanFrame {
   showRuler: boolean;
   rulerPad: number;
   cursorW: Pt | null;
+  /** All wall ends, kept by the caller until the walls change. */
+  vertices: Pt[];
   /** A source, the listener or a pair is being dragged: draw a lighter set of paths. */
   interacting: boolean;
 }
@@ -43,7 +45,7 @@ export function renderPlan(canvas: HTMLCanvasElement, f: PlanFrame) {
   const { props, box, view } = f;
   const scene: Scene = props.scene;
   const { heat, selection } = props;
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = canvasDpr();
   const W = Math.max(1, Math.round(box.w * dpr));
   const H = Math.max(1, Math.round(box.h * dpr));
   if (canvas.width !== W || canvas.height !== H) {
@@ -70,7 +72,7 @@ export function renderPlan(canvas: HTMLCanvasElement, f: PlanFrame) {
   drawWalls(g, view, scene, f.matColor, f.selSet);
   drawObstacleLabels(g, view, props.obstacles, scene.height);
   g.fillStyle = MUTED;
-  for (const p of allVertices(scene.walls)) {
+  for (const p of f.vertices) {
     const [x, y] = toPx(view, p[0], p[1]);
     g.beginPath();
     g.arc(x, y, 2.5, 0, Math.PI * 2);

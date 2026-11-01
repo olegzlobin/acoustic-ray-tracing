@@ -154,11 +154,12 @@
   });
 
   // ---- drawing
+  const vertices = $derived(allVertices(props.scene.walls));
   $effect(() => {
     // Track every reactive input of the drawing code.
     const p = props;
-    void [p.scene.walls, p.scene.height, p.obstacles, p.scene.materials, p.scene.sources, p.scene.listener, p.scene.yaw, p.selection, p.selectedSource, heatCanvas, p.heat, p.tool, p.grid, p.gridStep, p.paths, p.rayPaths, p.showRays, p.showOrders, vp.box, vp.view, gestures.mode, ui.tick, ui.cursorW, ui.showRuler, ui.params.sides, ui.params.circleSegs, ui.params.arcSegs, ui.params.stamp, p.drawMat];
-    renderPlan(canvas, { props: p, box: vp.box, view: vp.view, host, tool: T, toolId: p.tool, matColor, selSet, heatCanvas, showRuler: ui.showRuler, rulerPad, cursorW: ui.cursorW, interacting: gestures.mode === 'src' || gestures.mode === 'rot' || gestures.mode === 'lis' });
+    void [p.scene.walls, p.scene.height, p.obstacles, p.scene.materials, p.scene.sources, p.scene.listener, p.scene.yaw, p.selection, p.selectedSource, heatCanvas, vertices, p.heat, p.tool, p.grid, p.gridStep, p.paths, p.rayPaths, p.showRays, p.showOrders, vp.box, vp.view, gestures.mode, ui.tick, ui.cursorW, ui.showRuler, ui.params.sides, ui.params.circleSegs, ui.params.arcSegs, ui.params.stamp, p.drawMat];
+    renderPlan(canvas, { props: p, box: vp.box, view: vp.view, host, tool: T, toolId: p.tool, matColor, selSet, heatCanvas, vertices, showRuler: ui.showRuler, rulerPad, cursorW: ui.cursorW, interacting: gestures.mode === 'src' || gestures.mode === 'rot' || gestures.mode === 'lis' });
   });
 </script>
 

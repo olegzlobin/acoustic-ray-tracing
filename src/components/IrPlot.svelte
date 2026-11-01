@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { canvasDpr } from '../perf-mode.svelte';
   import { BAND_COLORS } from '../bands';
   import { LINE, MONO_FONT, MUTED } from '../theme';
   import { i18n, t } from '../i18n.svelte';
@@ -28,7 +29,7 @@
   });
 
   function draw() {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = canvasDpr();
     const W = Math.max(1, Math.round(box.w * dpr));
     const H = Math.max(1, Math.round(box.h * dpr));
     if (canvas.width !== W || canvas.height !== H) {
